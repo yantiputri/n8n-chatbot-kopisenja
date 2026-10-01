@@ -1,0 +1,119 @@
+{
+  "name": "Agen AI Chatbot Web - PA",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! ☕ Saya asisten virtual Kafe Kopi Senja. Ada yang bisa saya bantu soal menu, harga, atau jam buka?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3a3c9c80-bf3b-4ec9-b474-6fe2e760fe87",
+      "name": "When chat message received",
+      "webhookId": "48053016-c8ea-450c-96b7-11180459ef48"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "## Garis Besar\nAnda adalah asisten virtual Kafe Kopi Senja. Tugas Anda menjawab pertanyaan pelanggan tentang menu, harga, jam buka, dan cara pemesanan sesuai Dasar Pengetahuan di bawah ini.\n\n# Dasar Pengetahuan\n## Menu (format: Nama; Deskripsi; Harga)\nKopi Susu Senja; Espresso, susu segar, dan gula aren; Rp22.000\nAmericano; Espresso dengan air panas atau es; Rp18.000\nCappuccino; Espresso dengan susu berbusa; Rp25.000\nMatcha Latte; Teh hijau Jepang dengan susu; Rp26.000\nTeh Lemon; Teh segar dengan perasan lemon; Rp15.000\nRoti Bakar Cokelat; Roti tebal dengan selai cokelat dan keju; Rp20.000\nNasi Goreng Senja; Nasi goreng dengan telur dan ayam suwir; Rp28.000\nKentang Goreng; Kentang renyah dengan saus sambal atau mayones; Rp18.000\nPisang Goreng Madu; Pisang goreng dengan siraman madu; Rp16.000\n\n## Informasi Kafe\nJam buka: Setiap hari, 08.00 - 22.00 WIB\nAlamat: Jl. Melati No. 8\nPemesanan: Datang langsung atau pesan lewat WhatsApp 0812-0000-0000\nFasilitas: Wi-Fi gratis, colokan listrik, area outdoor\nPembayaran: Tunai, QRIS, dan transfer bank\n\n# Aturan\n- Jawab dengan bahasa Indonesia baku, ramah, dan emoji secukupnya.\n- Jawaban sederhana dan kurang dari 200 kata.\n- Hanya jawab berdasarkan Dasar Pengetahuan di atas. Jika informasi tidak ada, jangan mengarang. Jawab: \"Maaf, saya tidak memiliki informasi tersebut. Silakan hubungi WhatsApp 0812-0000-0000.\"\n- Jika pertanyaan tidak berkaitan dengan Kafe Kopi Senja, tolak dengan sopan dan arahkan kembali ke topik menu atau layanan kafe."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        -48
+      ],
+      "id": "0d00b8d4-2827-463d-b4b3-c378704b3dc4",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        160
+      ],
+      "id": "5fab6f0e-0952-4127-88ee-83a3d4fef99d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8uy1PZlW0jo8WD8I",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        480,
+        176
+      ],
+      "id": "d7d1e0d9-ff53-4bd1-96db-011935317590",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "90cb771c-56d1-4108-9c34-9fe439218063",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3245656e8a23e8d9fdab86a8eba1612940c8571a76bc7acd714c6f13c2c2e8aa"
+  },
+  "nodeGroups": [],
+  "id": "K7P8OIhu0okk9WN5",
+  "tags": []
+}
