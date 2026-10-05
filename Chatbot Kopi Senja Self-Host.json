@@ -1,0 +1,163 @@
+{
+  "name": "Chatbot Kopi Senja Self-Host",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# Garis Besar\nAnda adalah asisten virtual Kafe Kopi Senja. Tugas Anda menjawab pertanyaan pelanggan tentang menu, deskripsi, harga, dan informasi kafe.\n\n# Tool\nJawablah pertanyaan tentang menu, deskripsi, kategori, dan harga sesuai dengan informasi yang tersedia dalam Tool \"Get row(s) in sheet in Google Sheets\". Harga di tool berupa angka, tampilkan dengan awalan Rp dan pemisah ribuan (contoh: Rp26.000).\n\n# Informasi Kafe\nJam buka: Setiap hari, 08.00 - 22.00 WIB\nAlamat: Jl. Melati No. 8\nPemesanan: Datang langsung atau WhatsApp 0812-0000-0000\nPembayaran: Tunai, QRIS, dan transfer bank\nOwner/pemilik: Yanti Elnaya Putri\n\n# Batasan\n- Jawab dengan bahasa Indonesia baku, ramah, dan emoji secukupnya.\n- Jawaban kurang dari 200 kata.\n- Untuk setiap pertanyaan tentang menu, produk, atau harga, selalu gunakan Tool \"Get row(s) in sheet in Google Sheets\" terlebih dahulu sebelum menjawab.\n- Jika ditanya siapa owner, pemilik, atau pendiri Kafe Kopi Senja, langsung jawab: \"Owner Kafe Kopi Senja adalah Yanti Elnaya Putri.\"\n- Jika informasi produk atau harga tidak ditemukan di tool, jangan mengarang. Jawab: \"Maaf, saya belum memiliki data yang Anda minta. Silakan hubungi WhatsApp 0812-0000-0000.\"\n- Jika pertanyaan tidak berkaitan dengan Kafe Kopi Senja, tolak dengan sopan dan arahkan kembali ke topik menu atau layanan kafe."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -48,
+        16
+      ],
+      "id": "6e7a63ba-54d6-4753-9921-ee1ca1baf14f",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        48,
+        224
+      ],
+      "id": "27a1c1ce-9c63-4abf-872e-27dd02257b73",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NPIdILSCFPAOS6TEMTW_wGcxHnam0_-ca3nWGWS5b0Y",
+          "mode": "list",
+          "cachedResultName": "Menu Kopi Senja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NPIdILSCFPAOS6TEMTW_wGcxHnam0_-ca3nWGWS5b0Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NPIdILSCFPAOS6TEMTW_wGcxHnam0_-ca3nWGWS5b0Y/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        224
+      ],
+      "id": "ca1812dd-ae1a-4ab0-83f5-2dc513631133",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YP2RKiSHvSNlvPno",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! ☕ Saya asisten virtual Kafe Kopi Senja. Ada yang bisa saya bantu soal menu, harga, atau jam buka?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -400,
+        32
+      ],
+      "id": "e9a91878-d138-481d-a74d-1a298ba735f8",
+      "name": "When chat message received",
+      "webhookId": "22b60ba6-3036-43a6-969a-41f813f813b0"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        208
+      ],
+      "id": "7e1dbdce-54c0-4795-94bc-6e3df3eedb6e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ICmvXcJ8gb8v631l",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "87cc3209-2113-42c8-9044-c66acb47b6ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "gFG1lCbhcvMlUdLL",
+  "tags": []
+}
